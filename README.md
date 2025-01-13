@@ -1,70 +1,73 @@
 <h1 align="center">FontFinder</h1>
-The script preprocesses an image, extracts features using VGG16 and detects fonts via the WhatFontIs API. It includes image-to-base64 encoding and securely requires an API key for font identification.
+The code performs automatic colorization of black-and-white images using a pre-trained deep learning model. It loads the model and cluster centers, processes the input image, predicts color channels, combines them with the luminance channel, and converts the result to a colorized image.
 
 ## Execution Guide:
 1. Run the following command line in the terminal:
    ```
-   pip install tensorflow opencv-python numpy requests keras-preprocessing
+   pip install opencv-python opencv-contrib-python numpy
    ```
 
-2. Go to the site [What Font Is](https://www.whatfontis.com/API-identify-fonts-from-image.html) > create an account > copy the API key > paste it in the code
+2. Enter the path of the black and white images in the code, also enter the output directory.
 
-3. Copy paste the path of the image for whose font you want to detect
+3. Download the following models and paste their path in the code:
 
-4. Run the code and it will output its prediction
+   a. [colorization_deploy_v2.prototxt]()
+
+   b. [colorization_release_v2.caffemodel]()
+
+   c. [pts_in_hull.npy]()
+
+4. Run the code and it will output a colour image
 
 ## Model Prediction:
 
 Image Input:
 
-![image](https://github.com/user-attachments/assets/089385f4-1e58-428e-a93b-99cf9e5babbb)
+![blackwhite](https://github.com/user-attachments/assets/6cb433dc-426e-44f3-8b42-f15f9e4a69a5)
 
 Output:
 
-`Detected Font: Bernard MT Condensed`
+![colour](https://github.com/user-attachments/assets/e6c9acc0-9ed0-478c-95a3-0435bfe7355a)
 
 ## Overview:
-The Python code is a multi-functional script that combines image processing, feature extraction using a pre-trained deep learning model, and font detection via an API. Here's an overview of its key components:
+This script implements **automatic colorization of black-and-white images** using a pre-trained deep learning model in OpenCV. Below is a step-by-step breakdown:
 
-### **1. System and Logging Configuration**
-- Sets TensorFlow logging to minimal verbosity to suppress unnecessary warnings (`os.environ['TF_CPP_MIN_LOG_LEVEL']`).
-- Configures logging to suppress TensorFlow and OpenCV debug information for cleaner output.
+#### 1. **Library Imports**
+   - The script uses essential libraries: 
+     - `numpy` for numerical computations.
+     - `cv2` (OpenCV) for image processing.
+     - `os` for file path management.
 
-### **2. Libraries and Dependencies**
-- **OpenCV (`cv2`)**: For image processing tasks such as reading, resizing, and color conversion.
-- **NumPy**: For numerical operations on image arrays.
-- **TensorFlow & Keras**: To use the pre-trained VGG16 model for feature extraction.
-- **Requests**: To interact with the WhatFontIs API.
-- **Base64**: To encode images for API submission.
+#### 2. **Model Paths**
+   - Specifies the paths to the required model files:
+     - `prototxt`: Defines the network architecture.
+     - `caffemodel`: Contains the pre-trained weights.
+     - `npy`: Stores cluster centers for color distribution.
+   - Ensures paths are dynamically adjusted and checks the existence of critical files.
 
-### **3. Functions**
-**a. preprocess_image:** Prepares an image for input into the VGG16 model:
-  1. Reads the image from the specified path.
-  2. Converts the image from BGR (OpenCV format) to RGB.
-  3. Resizes the image to 224x224 (required input size for VGG16).
-  4. Converts the image to an array and preprocesses it using `preprocess_input` (scales pixel values).
+#### 3. **Model Initialization**
+   - Loads the pre-trained model (`.prototxt` and `.caffemodel`) using OpenCV's `cv2.dnn.readNetFromCaffe`.
+   - Loads the color cluster centers from the `.npy` file.
+   - Modifies the network by adding cluster centers as 1x1 convolutions.
 
-**b. extract_features:** Uses the pre-trained VGG16 model to extract deep features:
-  1. Loads the VGG16 model with pre-trained weights (ImageNet) and excludes the top classification layer (`include_top=False`).
-  2. Runs a forward pass on the preprocessed image to generate feature maps.
+#### 4. **Colorization Function (`colorize_image`)**
+   - **Input**: Path to a black-and-white image.
+   - **Steps**:
+     1. Reads the input image and verifies its existence.
+     2. Converts the image to the **LAB color space**, where:
+        - `L`: Lightness (input channel for colorization).
+        - `a` and `b`: Color channels (predicted by the model).
+     3. Preprocesses the image:
+        - Normalizes pixel values.
+        - Resizes the image to match the model input dimensions.
+        - Extracts and adjusts the `L` channel.
+     4. Feeds the processed `L` channel to the network.
+     5. Predicts the `a` and `b` channels and resizes them to the original image dimensions.
+     6. Combines the original `L` channel with the predicted `a` and `b` channels.
+     7. Converts the LAB image back to the **BGR color space** for display.
+     8. Clamps pixel values to the valid range and converts the image to 8-bit format.
 
-**c. detect_font_using_api:** Detects the font in an image using the **WhatFontIs API**:
-  1. Encodes the image into base64 format.
-  2. Prepares the payload with API key, base64 image, and other configurations.
-  3. Sends a POST request to the API endpoint.
-  4. Parses the response to print the detected font name or error details.
-
-**d. encode_image_to_base64:** Converts the input image into base64 format for API compatibility:
-  1. Reads the image as binary data.
-  2. Encodes the binary data into a base64 string.
-
-### **Use Case**
-- **Font Detection**: Identify fonts used in an image using a combination of image preprocessing and an external API.
-- **Feature Extraction**: Generate deep features from images for further analysis (e.g., image classification, clustering).
-
-### **Key Points**
-- The **VGG16 model** is used only for feature extraction and does not directly contribute to font detection.
-- The **WhatFontIs API** handles the actual font detection process, making this script an integration of local image processing and remote font recognition.
-- **Error Handling**: Basic error handling is implemented for the API response.
-
-This script is suitable for tasks involving image analysis and font identification in a streamlined workflow.
+### Key Features:
+- Utilizes OpenCV's **DNN module** to load and process pre-trained deep learning models.
+- Automatically converts and colorizes black-and-white images using the **LAB color space**.
+- Provides robust error handling for missing files or invalid inputs.
