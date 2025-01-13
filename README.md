@@ -1,4 +1,4 @@
-<h1 align="center">FontFinder</h1>
+<h1 align="center">ColourPulse</h1>
 The code performs automatic colorization of black-and-white images using a pre-trained deep learning model. It loads the model and cluster centers, processes the input image, predicts color channels, combines them with the luminance channel, and converts the result to a colorized image.
 
 ## Execution Guide:
@@ -25,7 +25,7 @@ Image Input:
 
 ![blackwhite](https://github.com/user-attachments/assets/6cb433dc-426e-44f3-8b42-f15f9e4a69a5)
 
-Output:
+Image Output:
 
 ![colour](https://github.com/user-attachments/assets/e6c9acc0-9ed0-478c-95a3-0435bfe7355a)
 
