@@ -11,11 +11,11 @@ The code performs automatic colorization of black-and-white images using a pre-t
 
 3. Download the following models and paste their path in the code:
 
-   a. [colorization_deploy_v2.prototxt]()
+   a. [colorization_deploy_v2.prototxt](https://github.com/kr1shnasomani/ColourPulse/blob/main/model/colorization_deploy_v2.prototxt)
 
-   b. [colorization_release_v2.caffemodel]()
+   b. [colorization_release_v2.caffemodel](https://www.dropbox.com/s/dx0qvhhp5hbcx7z/colorization_release_v2.caffemodel?dl=1)
 
-   c. [pts_in_hull.npy]()
+   c. [pts_in_hull.npy](https://github.com/kr1shnasomani/ColourPulse/blob/main/model/pts_in_hull.npy)
 
 4. Run the code and it will output a colour image
 
